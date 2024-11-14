@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import moby
+from .views import moby, kubic
 from .views.auth import require_login
 
 app_name = "pods"
@@ -11,4 +11,5 @@ urlpatterns = [
     path("moby/logs/<str:svcname>/", moby.print_journal, name="moby_journal"),
     # ex: /polls/5/vote/
     # path("<int:question_id>/vote/", views.vote, name="vote"),
+    path("kubic/", kubic.index, name="kubic_index"),
 ]

@@ -1,0 +1,119 @@
+{% extends "shared/base_app.html" %}
+
+{% block content %}
+<section id="vueapp">
+    <div class="py-left-nav">
+        <input type="search" placeholder="Keyword" v-model="filter.keyword" @input="debounced_filter()" />
+        <ol>
+            <li v-for="item in result.data" :key="item">
+                <a @click.prevent="throttle_logs(item)" :class="item.css" href="#" :title="item.Image">${item.Name}</a>
+            </li>
+        </ol>
+        <br />
+        <button type="button" @click="debounce_svclist(1)">Rescan Services</button>
+    </div>
+    <div class="py-main">
+        <p class="help">❇️ 最多1000行日志; ❇️ Since-Unit: m=Minute, h=Hour<br />
+            ❇️ Since空: 取最新N(空=20)行日志; ❇️ Since=30m: 自30分钟前开始, 取前N(空=20)行日志.</p>
+        <div class="filterbar">
+            Since: <input v-model="filter.logsince" placeholder="30m / 24h" @change="check_since" /> Ago,
+            Tail: <input v-model="filter.loglines" type="number" placeholder="last 20 lines." @change="check_tail" />
+            Lines
+            <button @click="search_log">Fetch</button>
+            <i class="help" style="color: #ffaa00;">${error}</i>
+        </div>
+        <pre style="height: calc(100vh - 255px); overflow: auto; white-space: pre-wrap; border: 1px;"
+            id="logview"></pre>
+    </div>
+    <br class="clear">
+</section>
+<script>
+    const petite = {
+        $delimiters: ['${', '}'],
+        result: { svc: null, data: [] },
+        error: '',
+        filter: { keyword: "", loglines: "", logsince: "" },
+        wand: {
+            //svc2: throttle_wand(), // for throttle
+            filter_svc: debounce_wand(), // for debounce
+            svc: debounce_wand(), // for debounce
+            fetch_logs: throttle_stream(), // for throttle
+        },
+        check_since(event) {
+            let since = this.filter.logsince;
+            console.log('since=' + since);
+            value = parseInt(since.replace(/[^0-9]/g, ''));
+            if (isNaN(value) || value <= 0) {
+                this.filter.logsince = '';
+            } else {
+                unit = since.slice(-1).toLowerCase();
+                unit = (unit && 'mh'.includes(unit)) ? unit : 'm';
+                this.filter.logsince = value + unit;
+            }
+        },
+        check_tail(event) {
+            let tail = this.filter.loglines;
+            console.log('tail=' + tail);
+            if (tail < 0) {
+                this.filter.loglines = '';
+            } else if (tail > 1000) {
+                this.filter.loglines = 1000;
+            }
+        },
+        debounced_filter() {
+            this.wand.filter_svc(() => {
+                let kw = this.filter.keyword.trim().toLowerCase();
+                this.result.data.forEach(el => {
+                    el.css = kw && el.Name.toLowerCase().includes(kw) ? 'highlight' : '';
+                });
+            });
+        },
+        search_log() {
+            console.log('search log..');
+            if (!this.result.svc) {
+                this.error = 'Select a service'
+            } else {
+                this.error = '';
+                this.throttle_logs(this.result.svc);
+            }
+        },
+        debounce_svclist(reload = '0') {
+            magic = this.wand.svc;
+            url = `{%url 'pylon:moby_index'%}moby/svcscan/${reload}`;
+            magic(() => {
+                axios.get(url).then(response => {
+                    console.log(response.data);
+                    this.result = response.data;
+                }).catch(error => {
+                    console.error('Error:', error);
+                })
+            });
+        },
+        throttle_logs(svc) {
+            magic = this.wand.fetch_logs;
+            maxLines = parseInt(this.filter.loglines);
+            if (isNaN(maxLines)) {
+                maxLines = 20;
+                this.filter.loglines = '';
+            }
+            since = this.filter.logsince;
+            since = since ? `Since ${since.toLowerCase()}` : '';
+
+            logPanel = document.querySelector('#logview');
+            this.error = '';
+            url = "{%url 'pylon:moby_index'%}moby/logs/"
+                + svc.Name + "/?since=" + this.filter.logsince
+                + "&lines=" + maxLines;
+            magic(url, (chunk) => {
+                logPanel.appendChild(document.createTextNode(chunk));
+            }, () => {
+                this.result.svc = svc;
+                logPanel.innerHTML = `[${svc.Name}, ${svc.Image}] ${since}, reading ${maxLines} logs ...\n`;
+            });
+        },
+    };
+
+    const app = PetiteVue.createApp(petite).mount("#vueapp");
+    petite.debounce_svclist();
+</script>
+{% endblock %}
