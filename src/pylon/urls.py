@@ -12,4 +12,6 @@ urlpatterns = [
     # ex: /polls/5/vote/
     # path("<int:question_id>/vote/", views.vote, name="vote"),
     path("kubic/", kubic.index, name="kubic_index"),
+    path("kubic/api/svcscan/<int:reload>", kubic.rescan_services, name="kubic_svcscan"),
+    path("kubic/api/logs/<str:svcname>/", kubic.print_journal, name="kubic_journal"),
 ]

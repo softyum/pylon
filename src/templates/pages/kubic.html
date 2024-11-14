@@ -79,7 +79,7 @@
         },
         debounce_svclist(reload = '0') {
             magic = this.wand.svc;
-            url = `{%url 'pylon:moby_index'%}moby/svcscan/${reload}`;
+            url = `{%url 'pylon:kubic_index'%}api/svcscan/${reload}`;
             magic(() => {
                 axios.get(url).then(response => {
                     console.log(response.data);
@@ -101,7 +101,7 @@
 
             logPanel = document.querySelector('#logview');
             this.error = '';
-            url = "{%url 'pylon:moby_index'%}moby/logs/"
+            url = "{%url 'pylon:kubic_index'%}api/logs/"
                 + svc.Name + "/?since=" + this.filter.logsince
                 + "&lines=" + maxLines;
             magic(url, (chunk) => {
