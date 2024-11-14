@@ -1,0 +1,94 @@
+body {
+    font-size: 1rem !important;
+}
+
+/* Left Navigation */
+.py-left-nav {
+    width: 200px;
+    color: var(--link-fg);
+    height: calc(100vh - 140px);
+    overflow: auto;
+    float: left;
+    border-right: #333 solid 1px;
+}
+
+.py-left-nav ul,
+.py-left-nav ol {
+    padding: 0;
+    margin: 0;
+}
+
+.py-left-nav li {
+    padding: 10px;
+}
+
+.py-left-nav a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Main Content */
+.py-main {
+    margin-left: 200px;
+    padding: 10px 0 0 20px;
+}
+
+.vue-app {
+    display: none;
+}
+
+/* from django-admin TOOLBAR */
+.filterbar {
+    padding: 8px 10px;
+    margin-bottom: 15px;
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
+    background: var(--darkened-bg);
+    color: var(--body-quiet-color);
+}
+
+.filterbar input {
+    border-radius: 4px;
+    font-size: 0.875rem;
+    padding: 5px;
+    color: var(--body-fg);
+}
+
+.filterbar .searchbar {
+    height: 1.1875rem;
+    border: 1px solid var(--border-color);
+    padding: 2px 5px;
+    margin: 0;
+    vertical-align: top;
+    font-size: 0.8125rem;
+    max-width: 100%;
+}
+
+.filterbar .searchbar:focus {
+    border-color: var(--body-quiet-color);
+}
+
+.filterbar input[type="submit"],
+.filterbar input[type="button"] {
+    border: 1px solid var(--border-color);
+    font-size: 0.8125rem;
+    padding: 4px 8px;
+    margin: 0;
+    vertical-align: middle;
+    background: var(--body-bg);
+    box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
+    cursor: pointer;
+    color: var(--body-fg);
+}
+
+.filterbar input[type="submit"]:focus,
+.filterbar input[type="submit"]:hover,
+.filterbar input[type="button"]:focus,
+.filterbar input[type="button"]:hover {
+    border-color: var(--body-quiet-color);
+}
+
+a.highlight{
+   color: var(--accent);
+   font-weight: 600;
+}
