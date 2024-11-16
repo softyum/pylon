@@ -2,6 +2,25 @@ import shlex
 import subprocess
 import time
 
+
+def exec_subproc(command: str | list):
+    if isinstance(command, str):
+        args = shlex.split(command)
+    elif isinstance(command, list):
+        args = command
+
+    print(f">> cmd: {args}")
+    try:
+        result = subprocess.check_output(
+            args,
+            cwd="/tmp",
+            shell=False,
+        ).decode("utf-8")
+        return result
+    except Exception as e:
+        return "$$Error: " + str(e)
+
+
 """
 execute shell command, return yield for HttpStreaming
 ex.

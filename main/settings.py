@@ -74,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "pyops.wsgi.application"
+WSGI_APPLICATION = "main.wsgi.application"
 
 
 # Database
@@ -127,7 +127,7 @@ USE_TZ = True
 
 # ex. ROOT_URLPREFIX = pylon/
 ROOT_URLPREFIX = "pylon/"
-ROOT_URLCONF = "pyops.urls"
+ROOT_URLCONF = "main.urls"
 
 # for @django.contrib.auth.decorators.login_required()
 LOGIN_URL = f"/{ROOT_URLPREFIX}admin/login/"

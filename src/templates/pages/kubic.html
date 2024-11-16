@@ -6,7 +6,7 @@
         <input type="search" placeholder="Keyword" v-model="filter.keyword" @input="debounced_filter()" />
         <ol>
             <li v-for="item in result.data" :key="item">
-                <a @click.prevent="throttle_logs(item)" :class="item.css" href="#" :title="item.Image">${item.Name}</a>
+                <a @click.prevent="throttle_logs(item)" :class="item.css" href="#" :title="item.Ns">${item.Ns} / ${item.Name}</a>
             </li>
         </ol>
         <br />
@@ -102,7 +102,7 @@
             logPanel = document.querySelector('#logview');
             this.error = '';
             url = "{%url 'pylon:kubic_index'%}api/logs/"
-                + svc.Name + "/?since=" + this.filter.logsince
+                + svc.Ns + "/" + svc.Name + "/?since=" + this.filter.logsince
                 + "&lines=" + maxLines;
             magic(url, (chunk) => {
                 logPanel.appendChild(document.createTextNode(chunk));
