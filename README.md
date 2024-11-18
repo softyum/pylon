@@ -6,7 +6,7 @@ Pylon is a tool for viewing logs in both Docker Swarm and Kubernetes.
 
 ## Getting started
 
-### Setup
+### 1. Setup
 
 Clone code to your Docker Swarm manager node or Your Kubernetes Master node. 
 - `git clone https://github.com/softyum/pylon.git`
@@ -16,14 +16,14 @@ Create & active a new Python virtual environment, and install requirements.
 - `source .venv/bin/activate`
 - `pip install -r requirements.txt`
 
-### Create a django user.
+### 2. Create a django user.
 
 Run django command to create a user.
 - `./manage createsuperuser`
-Follow django guide to input username, email and password.
+Follow django's guide to input username, email and password.
 
 
-### Run and have a look
+### 3. Run it and have a look
 
 Start Pylong
 - `./manage runserver`
