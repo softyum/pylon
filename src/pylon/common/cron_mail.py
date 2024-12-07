@@ -83,7 +83,7 @@ def exec_job_command():
 
     result = ""
     if dry_run:
-        args = ["echo", "-e", f"'-c = {job_command}'"]
+        args = ["echo", "-e", f"'--command: {job_command}'"]
 
     try:
         proc = subprocess.Popen(
