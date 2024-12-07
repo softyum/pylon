@@ -1,3 +1,4 @@
+# python3 or pypy3.10
 import shlex
 import argparse
 import subprocess
@@ -7,21 +8,31 @@ import smtplib
 from email.message import EmailMessage
 from sys import stdout
 import logging
-from logging import getLogger, basicConfig, StreamHandler
-
-basicConfig(
-    format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s", datefmt="%m-%d %H:%M"
-)
 
 log_buffer = io.StringIO()
-__logger = logging.getLogger(__name__)
-__logger.setLevel("INFO")
 
-__file_handler = logging.StreamHandler(log_buffer)
-__console_handler = logging.StreamHandler(stdout)
-__logger.addHandler(__file_handler)
-__logger.addHandler(__console_handler)
+# Configure the root logger
+logging.basicConfig(
+    level=logging.INFO,
+    # format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    # datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s - %(message)s",
+    datefmt="%H:%M:%S",
+    handlers=[
+        logging.StreamHandler(log_buffer),
+        logging.StreamHandler(),
+    ],
+)
 
+
+def testlogging():
+    logging.info("hello")
+    logging.info("world")
+    print(log_buffer.getvalue())
+    exit(0)
+
+
+# testlogging()
 
 # parse args
 parser = argparse.ArgumentParser(add_help=False)
@@ -35,7 +46,7 @@ parser.add_argument("-s", "--subject")  # option that takes a value
 # parser.add_argument('-v', '--verbose', action='store_true')  # on/off flag
 
 parsed_args = parser.parse_args()
-__logger.info(parsed_args)
+logging.info(parsed_args)
 ssmtp_host = parsed_args.host
 ssmtp_port = parsed_args.port
 ssmtp_user = parsed_args.user
@@ -65,9 +76,9 @@ def exec_job_command():
     elif isinstance(command, list):
         args = command
 
-    __logger.info(f">> cmd: {args}")
+    logging.info(f">> cmd: {args}")
     start_at = datetime.datetime.now()
-    __logger.info(f">> start job at: {start_at}")
+    logging.info(f">> start job at: {start_at}")
 
     proc = subprocess.Popen(
         args,
@@ -83,7 +94,7 @@ def exec_job_command():
     try:
         for line in iter(proc.stdout.readline, b""):
             output = line.decode("utf-8")
-            __logger.info(output)
+            logging.info(output)
     except Exception as e:
         # the fetch will handle the error message
         logging.error(e)
@@ -91,12 +102,13 @@ def exec_job_command():
     finally:
         proc.kill()
         return_code = proc.wait(5)
-        __logger.info(f">> Kill code={return_code}")
+        logging.info(f">> Kill code={return_code}")
         result = "Success" if return_code == 0 else "Failed"
         end_at = datetime.datetime.now()
-        __logger.info(f">> finish job at: {end_at}")
+        logging.info(f">> finish job at: {end_at}")
 
     # send_email(ssmtp_to, f"[{result}] - {ssmtp_subject}", log_buffer.getvalue())
+    print("\n\n--buffer--")
     print(log_buffer.getvalue())
 
 
