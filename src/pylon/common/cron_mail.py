@@ -92,9 +92,9 @@ def exec_job_command():
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,  # set stderr to stdout, then to PIPE by stdout
-            # universal_newlines=True,
-            bufsize=1,
+            bufsize=4096,
         )
+        # if universal_newlines=True and bufsize=1, sentinel=""
         for line in iter(proc.stdout.readline, b""):
             output = line.decode("utf-8")
             logging.info(output)
