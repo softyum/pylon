@@ -70,7 +70,7 @@ def send_email(recipient_email, subject, body):
 
 
 def exec_job_command():
-    print("\n-- execute job --\n")
+    print("\n-- execute job --\n", flush=True)
     command = job_command
     if isinstance(command, str):
         args = shlex.split(command)
@@ -92,7 +92,8 @@ def exec_job_command():
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,  # set stderr to stdout, then to PIPE by stdout
-            bufsize=4096,
+            # universal_newlines=True,
+            bufsize=1,
         )
         for line in iter(proc.stdout.readline, b""):
             output = line.decode("utf-8")
@@ -109,19 +110,19 @@ def exec_job_command():
         end_at = datetime.datetime.now().strftime(fmt_timestamp)
         logging.info(f"## {result} job at: {end_at}")
 
-    print("\n-- send mail --\n")
+    print("\n-- send mail --\n", flush=True)
     if ssmtp_to:
         send_email(
             ssmtp_to, f"[{result} {start_at}] - {ssmtp_subject}", log_buffer.getvalue()
         )
     else:
         logging.info("skip: no recipient_email\n")
-        print(log_buffer.getvalue())
+        print(log_buffer.getvalue(), flush=True)
 
 
 if __name__ == "__main__":
     if dry_run:
-        print("\n-- args --\n")
+        print("\n-- args --\n", flush=True)
         logging.info(parsed_args)
         logging.info(
             f"smtp={ssmtp_host}:{ssmtp_port}, from={ssmtp_user}, to={ssmtp_to}"
