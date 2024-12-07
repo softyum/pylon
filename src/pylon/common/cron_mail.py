@@ -1,4 +1,11 @@
-# python3 or pypy3.10
+"""
+python3 or pypy3.10
+
+cron_mail.py -h=smtpdm.aliyun.com -p=465 -u=user -P=password -t=to -s=subject -c=command --dry-run
+
+cron_mail.py -c='sh -c "echo abc123"' -t=bug.fyi@foxmail.com -u=from@domain -P=password -s'Test Job'
+"""
+
 import shlex
 import argparse
 import subprocess
@@ -6,9 +13,9 @@ import io
 import datetime
 import smtplib
 from email.message import EmailMessage
-from sys import stdout
 import logging
 
+fmt_timestamp = "%D %H:%M:%S"
 log_buffer = io.StringIO()
 
 # Configure the root logger
@@ -24,20 +31,10 @@ logging.basicConfig(
     ],
 )
 
-
-def testlogging():
-    logging.info("hello")
-    logging.info("world")
-    print(log_buffer.getvalue())
-    exit(0)
-
-
-# testlogging()
-
 # parse args
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument("-c", "--command")
-parser.add_argument("-h", "--host")
+parser.add_argument("-h", "--host", default="smtpdm.aliyun.com")
 parser.add_argument("-p", "--port", type=int, default=465)
 parser.add_argument("-u", "--user")
 parser.add_argument("-P", "--password", default="")
@@ -81,7 +78,7 @@ def exec_job_command():
         args = command
 
     logging.info(f"cmd: {args}")
-    start_at = datetime.datetime.now()
+    start_at = datetime.datetime.now().strftime(fmt_timestamp)
     logging.info(f"start job at: {start_at}")
 
     result = ""
@@ -91,7 +88,7 @@ def exec_job_command():
     try:
         proc = subprocess.Popen(
             args,
-            cwd="/tmp",
+            # cwd="/tmp",
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,  # set stderr to stdout, then to PIPE by stdout
@@ -109,12 +106,17 @@ def exec_job_command():
         return_code = proc.wait(5)
         logging.info(f"Kill code={return_code}")
         result = "Success" if return_code == 0 else "Failed"
-        end_at = datetime.datetime.now()
-        logging.info(f"finish job at: {end_at}")
+        end_at = datetime.datetime.now().strftime(fmt_timestamp)
+        logging.info(f"## {result} job at: {end_at}")
 
     print("\n-- send mail --\n")
-    send_email(ssmtp_to, f"[{result}] - {ssmtp_subject}", log_buffer.getvalue())
-    # print(log_buffer.getvalue())
+    if ssmtp_to:
+        send_email(
+            ssmtp_to, f"[{result} {start_at}] - {ssmtp_subject}", log_buffer.getvalue()
+        )
+    else:
+        logging.info("skip: no recipient_email\n")
+        print(log_buffer.getvalue())
 
 
 if __name__ == "__main__":
