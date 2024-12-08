@@ -1,9 +1,16 @@
 """
 python3 or pypy3.10
+--dry-run, only print args and command
+-h, --host=smtpdm.aliyun.com
+-p, --port=465
+-u, --user=from@mail.domain
+-P, --password==password
+-t, --to=bug.fyi@foxmail.com
+-s, --subject="CronJob - Demo"
+-c, --command='sh -c "echo 123;sleep 2;echo abc"'
 
-cron_mail.py -h=smtpdm.aliyun.com -p=465 -u=user -P=password -t=to -s=subject -c=command --dry-run
-
-cron_mail.py -c='sh -c "echo abc123"' -t=bug.fyi@foxmail.com -u=from@domain -P=password -s'Test Job'
+cron_mail.py -c='sh -c "echo abc123"' -s'Test Job' --dry-run
+cron_mail.py -t=bug.fyi@foxmail.com -u=from@domain -Ppassword -c'sh ./script.sh' -s'subject'
 """
 
 import shlex
@@ -38,7 +45,7 @@ parser.add_argument("-h", "--host", default="smtpdm.aliyun.com")
 parser.add_argument("-p", "--port", type=int, default=465)
 parser.add_argument("-u", "--user")
 parser.add_argument("-P", "--password", default="")
-parser.add_argument("-t", "--to", required=False)
+parser.add_argument("-t", "--to")
 parser.add_argument("-s", "--subject")
 parser.add_argument("--dry-run", action="store_true")  # # on/off flag
 # parser.add_argument('-v', '--verbose', action='store_true')  # on/off flag
@@ -92,14 +99,12 @@ def exec_job_command():
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,  # set stderr to stdout, then to PIPE by stdout
-            universal_newlines=True,  # better for text-base and Cross-Platform
-            bufsize=1,  # output line by line, 0 if universal_newlines=False
+            # universal_newlines=True,  # Cross-Platform, bufsize=1, sentinel=""
+            bufsize=4096,  # 1 if universal_newlines=True
         )
-        # for line in iter(proc.stdout.readline, b""): # universal_newlines=False, sentinel=b""
-        #    output = line.decode("utf-8") # sentinel=b""
-        for line in iter(proc.stdout.readline, ""):
-            # universal_newlines=True,sentinel=""
-            logging.info(line)
+        for line in iter(proc.stdout.readline, b""):
+            output = line.decode("utf-8")
+            logging.info(output)
     except Exception as e:
         # the fetch will handle the error message
         logging.error(e)
