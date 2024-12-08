@@ -92,12 +92,14 @@ def exec_job_command():
             shell=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,  # set stderr to stdout, then to PIPE by stdout
-            bufsize=4096,
+            universal_newlines=True,  # better for text-base and Cross-Platform
+            bufsize=1,  # output line by line, 0 if universal_newlines=False
         )
-        # if universal_newlines=True and bufsize=1, sentinel=""
-        for line in iter(proc.stdout.readline, b""):
-            output = line.decode("utf-8")
-            logging.info(output)
+        # for line in iter(proc.stdout.readline, b""): # universal_newlines=False, sentinel=b""
+        #    output = line.decode("utf-8") # sentinel=b""
+        for line in iter(proc.stdout.readline, ""):
+            # universal_newlines=True,sentinel=""
+            logging.info(line)
     except Exception as e:
         # the fetch will handle the error message
         logging.error(e)
