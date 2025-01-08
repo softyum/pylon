@@ -21,7 +21,7 @@ def print_journal(request: HttpRequest, svcname: str):
     try:
         lines = int(request.GET.get("lines"))
     except:
-        lines = 20
+        lines = 200
     since = request.GET.get("since").lower()
     if since and since.endswith(("m", "h")):
         cmd += ["--since", since]

@@ -16,7 +16,7 @@ def print_journal(request: HttpRequest, svcns: str, svcname: str):
     try:
         lines = int(request.GET.get("lines"))
     except:
-        lines = 20
+        lines = 200
 
     cmd = f"kubectl -n '{ns}' logs --limit-bytes={limit_bytes} --tail={lines} 'deployments/{app_name}'"
     since = request.GET.get("since").lower()

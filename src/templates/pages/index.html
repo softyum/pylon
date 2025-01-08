@@ -13,11 +13,11 @@
         <button type="button" @click="debounce_svclist(1)">Rescan Services</button>
     </div>
     <div class="py-main">
-        <p class="help">❇️ 最多1000行日志; ❇️ Since-Unit: m=Minute, h=Hour<br />
-            ❇️ Since空: 取最新N(空=20)行日志; ❇️ Since=30m: 自30分钟前开始, 取前N(空=20)行日志.</p>
+        <p class="help">❇️ 最多5000行日志; ❇️ Since-Unit: m=Minute, h=Hour<br />
+            ❇️ Since空: 取最新N(空=200)行日志; ❇️ Since=30m: 自30分钟前开始, 取前N(空=200)行日志.</p>
         <div class="filterbar">
             Since: <input v-model="filter.logsince" placeholder="30m / 24h" @change="check_since" /> Ago,
-            Tail: <input v-model="filter.loglines" type="number" placeholder="last 20 lines." @change="check_tail" />
+            Tail: <input v-model="filter.loglines" type="number" placeholder="last 200 lines." @change="check_tail" />
             Lines
             <button @click="search_log">Fetch</button>
             <i class="help" style="color: #ffaa00;">${error}</i>
@@ -56,8 +56,8 @@
             console.log('tail=' + tail);
             if (tail < 0) {
                 this.filter.loglines = '';
-            } else if (tail > 1000) {
-                this.filter.loglines = 1000;
+            } else if (tail > 5000) {
+                this.filter.loglines = 5000;
             }
         },
         debounced_filter() {
@@ -93,7 +93,7 @@
             magic = this.wand.fetch_logs;
             maxLines = parseInt(this.filter.loglines);
             if (isNaN(maxLines)) {
-                maxLines = 20;
+                maxLines = 200;
                 this.filter.loglines = '';
             }
             since = this.filter.logsince;

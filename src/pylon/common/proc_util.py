@@ -29,8 +29,8 @@ StreamingHttpResponse(exec_iter_subproc('echo 123'), "text/plain; charset=utf-8"
 
 
 def exec_iter_subproc(command: str | list, max_yield=20):
-    if max_yield > 1000:
-        max_yield = 1000
+    if max_yield > 5000:
+        max_yield = 5000
     if isinstance(command, str):
         args = shlex.split(command)
     elif isinstance(command, list):
